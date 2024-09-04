@@ -32,7 +32,7 @@ const LoginForm: React.FC = () => {
     const onSubmit = async (data: LoginFormInputs) => {
         try {
             const response = await axiosInstance.post('/auth/login', data);
-            dispatch(loginSuccess({ user: response.data.user }));
+            dispatch(loginSuccess({ user: response.data.user, accessToken:response.data.accessToken }));
             console.log('Login successful:', response.data );
             navigate('/home')
         } catch (error) {

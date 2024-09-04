@@ -4,6 +4,7 @@ import axiosInstance from '../../utils/axiosInstance';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../contexts/store';
 import { useNavigate } from 'react-router-dom';
+import LogoutButton from '../../components/Auth/LogoutButton';
 
 
 const Home: React.FC = () => {
@@ -13,24 +14,21 @@ const Home: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!user) {
-            navigate('/login'); // Redirect to login if no user is found
-        } else {
-            // Example of making an authenticated request
-            axiosInstance.get('/users')
-                .then(response => {
-                    console.log('Protected data:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error fetching protected data:', error);
-                });
-        }
-    }, [user,navigate]);
+        axiosInstance.get('/users')
+            .then(response => {
+                console.log('Protected data:', response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching protected data:', error);
+            });
+
+    }, [user, navigate]);
 
     return (
         <div className='home-container'>
             <header className='header'>
                 <h1>Real-time collaborative whiteboard</h1>
+                <LogoutButton />
             </header>
             <main className='main-content'>
                 {status === 'loading' && <p>Loading...</p>}
@@ -44,7 +42,7 @@ const Home: React.FC = () => {
                 )}
             </main>
         </div>
-    )
+    );
 }
 
 export default Home;

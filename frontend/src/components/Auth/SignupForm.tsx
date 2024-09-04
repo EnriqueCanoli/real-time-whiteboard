@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { loginFailure, loginSuccess } from '../../contexts/auth/authSlice';
 import axiosInstance from '../../utils/axiosInstance';
+import { useNavigate } from 'react-router-dom';
 
 
 interface SignupFormInputs {
@@ -21,13 +22,15 @@ const SignupForm: React.FC = () => {
         resolver: yupResolver(signupSchema)
     })
 
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const onSubmit = async (data: SignupFormInputs) => {
         try {
             console.log(data)
             const response = await axiosInstance.post('/auth/signup', data);
-            dispatch(loginSuccess({ user: response.data }));
+            navigate('/login'); 
+           // dispatch(loginSuccess({ user: response.data }));
             console.log('Signup successful:', response.data);
         } catch (error) {
             dispatch(loginFailure('Signup failed. Please try again.'));

@@ -5,12 +5,14 @@ interface AuthState {
         name: string;
         email: string;
     } | null;
+    accessToken: string | null;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
 }
 
 const initialState: AuthState = {
     user: null,
+    accessToken: null,
     status: 'idle',
     error: null,
 };
@@ -22,9 +24,10 @@ const authSlice = createSlice({
         loginRequest(state) {
             state.status = 'loading';
         },
-        loginSuccess(state, action: PayloadAction<{ user: { name: string; email: string } }>) {
+        loginSuccess(state, action: PayloadAction<{ user: { name: string; email: string }, accessToken: string }>) {
             state.status = 'succeeded';
             state.user = action.payload.user;
+            state.accessToken = action.payload.accessToken;
             state.error = null;
         },
         loginFailure(state, action: PayloadAction<string>) {
@@ -33,6 +36,7 @@ const authSlice = createSlice({
         },
         logout(state) {
             state.user = null;
+            state.accessToken = null;
             state.status = 'idle';
             state.error = null;
         },
