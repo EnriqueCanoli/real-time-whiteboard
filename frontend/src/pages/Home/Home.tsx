@@ -11,18 +11,24 @@ const Home: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);
     const status = useSelector((state: RootState) => state.auth.status);
     const error = useSelector((state: RootState) => state.auth.error);
+    const accessToken = useSelector((state: RootState) => state.auth.accessToken)
     const navigate = useNavigate();
 
     useEffect(() => {
-        axiosInstance.get('/users')
+        console.log("access ", accessToken)
+        if(accessToken){
+            axiosInstance.get('/users')
             .then(response => {
-                console.log('Protected data:', response.data);
+                console.log('Protected data:', response.data, );
             })
             .catch(error => {
                 console.error('Error fetching protected data:', error);
             });
 
-    }, [user, navigate]);
+        }
+        
+
+    }, [accessToken, navigate]);
 
     return (
         <div className='home-container'>

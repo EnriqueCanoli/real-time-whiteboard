@@ -14,7 +14,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component })
         // If no access token, redirect to login page
         return <Navigate to="/login" />;
     }
-
+    
     return <Component />;
 };
 

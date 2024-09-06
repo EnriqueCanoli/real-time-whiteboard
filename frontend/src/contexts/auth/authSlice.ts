@@ -33,6 +33,7 @@ const authSlice = createSlice({
         loginFailure(state, action: PayloadAction<string>) {
             state.status = 'failed';
             state.error = action.payload;
+            state.accessToken = null;
         },
         logout(state) {
             state.user = null;
@@ -40,9 +41,13 @@ const authSlice = createSlice({
             state.status = 'idle';
             state.error = null;
         },
+        refreshToken(state, action:PayloadAction<{accessToken: string }> ){
+            console.log("se guarda: " , action.payload.accessToken)
+            state.accessToken = action.payload.accessToken;
+        }
     }
 });
 
-export const { loginRequest, loginSuccess, loginFailure, logout } = authSlice.actions;
+export const { loginRequest, loginSuccess, loginFailure, logout, refreshToken } = authSlice.actions;
 
 export default authSlice.reducer;
