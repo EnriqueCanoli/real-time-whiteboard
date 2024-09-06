@@ -29,9 +29,6 @@ const signup = async (email, password, name) => {
 
 const login = async (email,password) => {
     try {
-        console.log('JWT_SECRET:', process.env.JWT_SECRET);
-        console.log('JWT_REFRESH_SECRET:', process.env.JWT_REFRESH_SECRET);
-
         const [users] = await db.promise().query('SELECT * FROM users WHERE email = ? ', [email]);
         const user = users[0]
 
@@ -50,13 +47,13 @@ const login = async (email,password) => {
         const accessToken = jwt.sign(
             { userId: user.id, email: email },
             process.env.JWT_SECRET,
-            { expiresIn: '15m' }
+            { expiresIn: '1m' }
         );
         
         const refreshToken = jwt.sign(
             { userId: user.id, email: email },
             process.env.JWT_REFRESH_SECRET,
-            { expiresIn: '7d' }
+            { expiresIn: '5m' }
         );
         
 
@@ -72,12 +69,21 @@ const login = async (email,password) => {
     }
 }
 
-const refreshToken = async (token) => {
+const refreshToken = async (refreshToken) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-        const accessToken = jwt.sign({userId:decoded.userId},process.env.JWT_SECRET, { expiresIn: '15m'})
-
-        return {accessToken}
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        // Fetch stored token from database
+        //console.log("[decoded.userId] ", [decoded.userId])
+        const [rows] = await db.promise().query('SELECT refreshToken FROM users WHERE id = ?', [decoded.userId]);
+        const storedToken = rows[0]?.refreshToken;
+        //console.log("storedToken", storedToken)
+        if (storedToken !== refreshToken) {
+            return res.status(401).json({ message: 'Invalid refresh token' });
+        }
+        
+        const accessToken = jwt.sign({ userId: decoded.userId, email: decoded.email }, process.env.JWT_SECRET, { expiresIn: '1m' });
+        
+        return { accessToken:accessToken };
     } catch (error) {
         throw error
     }
