@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../contexts/store';
 import { useNavigate } from 'react-router-dom';
 import LogoutButton from '../../components/Auth/LogoutButton';
+import Whiteboard from '../../components/Whiteboard/Whiteboard';
 
 
 const Home: React.FC = () => {
@@ -13,6 +14,7 @@ const Home: React.FC = () => {
     const error = useSelector((state: RootState) => state.auth.error);
     const accessToken = useSelector((state: RootState) => state.auth.accessToken)
     const navigate = useNavigate();
+
 
     useEffect(() => {
         console.log("access ", accessToken)
@@ -30,6 +32,8 @@ const Home: React.FC = () => {
 
     }, [accessToken, navigate]);
 
+    
+
     return (
         <div className='home-container'>
             <header className='header'>
@@ -40,9 +44,7 @@ const Home: React.FC = () => {
                 {status === 'loading' && <p>Loading...</p>}
                 {status === 'failed' && <p>{error}</p>}
                 {user ? (
-                    <div className='whiteboard-placeholder'>
-                        <p>Welcome, {user.name}! Here's your whiteboard area.</p>
-                    </div>
+                    <Whiteboard />
                 ) : (
                     <p>Please log in to access the whiteboard.</p>
                 )}

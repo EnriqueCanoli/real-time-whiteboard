@@ -1,0 +1,4 @@
+canvas {
+  touch-action: none; /* Prevent scrolling or zooming on touch */
+  border: 1px solid black;
+}

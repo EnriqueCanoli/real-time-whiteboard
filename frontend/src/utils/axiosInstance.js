@@ -37,10 +37,11 @@ axiosInstance.interceptors.response.use(
                     error.config.headers['Authorization'] = `Bearer ${newAccessToken}`;
                     store.dispatch(refreshToken({accessToken:newAccessToken}))
                     return axios(error.config); // Retry the original request with new token
+                }else{
+                    store.dispatch(loginFailure('Invalid credentials'));
                 }
             } catch (refreshError) {
                 console.error('Token refresh failed:', refreshError);
-                store.dispatch(loginFailure('Invalid credentials'));
                 return Promise.reject(refreshError);
             }
         }
