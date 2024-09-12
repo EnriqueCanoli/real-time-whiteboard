@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './Whiteboard.css'
+import axiosInstance from '../../utils/axiosInstance';
 
 const Canvas: React.FC = () => {
     //we use a useRef to reference the canvas HTML element, it is used to access DOM elements
@@ -8,6 +9,7 @@ const Canvas: React.FC = () => {
     const contextRef = useRef<CanvasRenderingContext2D | null>(null);
     //to track whether the user is currently drawing
     const [isDrawing, setIsDrawing] = useState(false);
+    const [sessionId, setSessionId] = useState<string>('default')
 
     const [color, setColor] = useState<string>('#000000');
     const [lineWidth, setLineWidth] = useState<number>(5);
@@ -24,6 +26,8 @@ const Canvas: React.FC = () => {
         context.lineCap = 'round';
         context.lineWidth = lineWidth;
         contextRef.current = context;
+
+        loadCanvas();
     }, []);
 
     useEffect(() => {
@@ -61,6 +65,43 @@ const Canvas: React.FC = () => {
         setLineWidth(Number(event.target.value));
     };
 
+    const saveCanvas = async () => {
+        const canvas = canvasRef.current;
+        const canvasData = canvas?.toDataURL(); // get the data as an image
+        try {
+            const response = await axiosInstance.post('/canvas/save-canvas', {sessionId,canvasData});
+            alert('Canvas session saved successfully!');
+        } catch (error) {
+            console.error('Failed to save canvas');
+        }
+        
+
+    }
+
+    // Load the canvas session by fetching the canvas data from the API
+    const loadCanvas = async () => {
+        if (!sessionId.trim()) {
+            alert('Session ID cannot be empty');
+            return;
+        }
+        
+        const response = await axiosInstance.get(`/canvas/load-canvas/${sessionId}`);
+    
+        if (response.status === 200) {
+            const { canvasData } = response.data;
+            const canvas = canvasRef.current!;
+            const context = canvas.getContext('2d')!;
+            const image = new Image();
+    
+            image.src = canvasData;
+            image.onload = () => {
+                context.drawImage(image, 0, 0);  // Draw the saved canvas image data
+            };
+        } else {
+            alert('Failed to load the canvas session');
+        }
+    };
+    
     //onMouseLeave={finishDrawing}: If the mouse leaves the drawing area, it stops drawing.
     return (
         <div style={{ display: 'flex'  }}>
@@ -83,6 +124,15 @@ const Canvas: React.FC = () => {
                     max="100"
                     style={{ marginBottom: '10px' }}
                 />
+                <input
+                    type="text"
+                    value={sessionId}
+                    onChange={(e) => setSessionId(e.target.value)}
+                    placeholder="Session ID"
+                    style={{ marginBottom: '10px' }}
+                />
+                {/* Save Button */}
+                <button onClick={saveCanvas}>Save Session</button>
             </div>
             <canvas
                 ref={canvasRef}
